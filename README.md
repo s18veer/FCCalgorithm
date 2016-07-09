@@ -1,0 +1,2 @@
+# FCCalgorithm
+FreeCodeCamp Algorithm script
