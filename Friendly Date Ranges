@@ -1,0 +1,51 @@
+function friendly(str) {
+  var d = new Date();
+  var monthNames = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                   ];
+  var dayNum = ["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th",
+                "12th","13th","14th","15th","16th","17th","18th","19th","20th","21st",
+                "22nd","23rd","24th","25th","26th","27th","28th","29th","30th","31st"
+               ];
+  var date1 = str[0].split("-");
+  var date2 = str[1].split("-");
+  // String: Month date, tomonth todate, year
+  var display = [];
+  
+  if(date1[1] === date2[1]){
+    display[0] = monthNames[date1[1] - 1];
+  } 
+
+  if(date1[2] !== date2[2]){
+    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1];
+    display[1] = dayNum[date2[2] - 1];
+  }
+  
+  if(date1[0] !== date2[0] && date1[1] !== date2[1] && date1[2] !== date2[2]){
+    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1] + ", " + date1[0];
+    display[1] = monthNames[date2[1] - 1] + " " + dayNum[date2[2] - 1] + ", " + date2[0];
+  }
+  
+  if(parseInt(date1[0],10) === parseInt(date2[0],10) - 1 && parseInt(date2[1],10) < parseInt(date1[1],10)){
+    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1];
+    display[1] = monthNames[date2[1] - 1] + " " + dayNum[date2[2] - 1];
+  }
+  
+  if(date1[0] !== date2[0] && date1[1] === date2[1]){
+    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1] + ", " + date1[0];
+    display[1] = monthNames[date2[1] - 1] + " " + dayNum[date2[2] - 1] + ", " + date2[0];
+  }
+  
+  if(date1[0] === date2[0] && date1[1] !== date2[1]){
+    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1];
+    display[1] = monthNames[date2[1] - 1] + " " + dayNum[date2[2] - 1] + ", " + date2[0];
+  }
+  
+  if(date1[0] === date2[0] && date1[1] === date2[1] && date1[2] === date2[2]){
+    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1] + ", " + date1[0];
+  }
+  
+  return display;
+}
+
+friendly(['2015-12-01', '2016-02-03']);
