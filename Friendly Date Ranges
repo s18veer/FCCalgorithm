@@ -1,4 +1,4 @@
-function friendly(str) {
+function makeFriendlyDates(str) {
   var d = new Date();
   var monthNames = ["January", "February", "March", "April", "May", "June",
                     "July", "August", "September", "October", "November", "December"
@@ -48,4 +48,4 @@ function friendly(str) {
   return display;
 }
 
-friendly(['2015-12-01', '2016-02-03']);
+makeFriendlyDates(['2015-12-01', '2016-02-03']);
