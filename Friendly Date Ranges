@@ -1,51 +1,73 @@
-function makeFriendlyDates(str) {
-  var d = new Date();
-  var monthNames = ["January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"
-                   ];
-  var dayNum = ["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th",
-                "12th","13th","14th","15th","16th","17th","18th","19th","20th","21st",
-                "22nd","23rd","24th","25th","26th","27th","28th","29th","30th","31st"
-               ];
-  var date1 = str[0].split("-");
-  var date2 = str[1].split("-");
-  // String: Month date, tomonth todate, year
-  var display = [];
+function makeFriendlyDates(arr) {
+  var newarr = [arr[0].split('-'), arr[1].split('-')];
+  var now = new Date();
+  var months = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
   
-  if(date1[1] === date2[1]){
-    display[0] = monthNames[date1[1] - 1];
-  } 
-
-  if(date1[2] !== date2[2]){
-    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1];
-    display[1] = dayNum[date2[2] - 1];
+  var first = new Date(0);
+  first.setDate(Number.parseInt(newarr[0][2], 10));
+  first.setMonth(Number.parseInt(newarr[0][1], 10) - 1);
+  first.setYear(Number.parseInt(newarr[0][0], 10));
+  
+  
+  var second = new Date(0);
+  second.setDate(Number.parseInt(newarr[1][2], 10));
+  second.setMonth(Number.parseInt(newarr[1][1], 10) - 1);
+  second.setYear(Number.parseInt(newarr[1][0], 10));
+  
+  console.log(first + " " + second);
+  
+  var greater = second.valueOf() > first.valueOf();
+  var withinOne = (second.valueOf() - first.valueOf()) < 31536000000;
+  console.log((withinOne) ? "within" : "without");
+  
+  var result = [""];
+  
+  result[0] += months[first.getMonth()];
+  result[0] += " " + ordinalize(first.getDate());
+  
+  if (!greater || 
+      (now.getYear() != first.getYear() || 
+      !withinOne)) {
+    
+    result[0] += ", " + (first.getYear() + 1900);
   }
   
-  if(date1[0] !== date2[0] && date1[1] !== date2[1] && date1[2] !== date2[2]){
-    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1] + ", " + date1[0];
-    display[1] = monthNames[date2[1] - 1] + " " + dayNum[date2[2] - 1] + ", " + date2[0];
+  if (greater) {
+    result.push("");
+    
+    if ((first.getMonth() != second.getMonth()) ||
+        (first.getYear() != second.getYear())) {
+      result[1] = months[second.getMonth()] + " ";
+    }
+    
+    result[1] += ordinalize(second.getDate());
+    
+    if (!withinOne) {
+      result[1] += ", " + (second.getYear() + 1900);
+    }
+    
   }
   
-  if(parseInt(date1[0],10) === parseInt(date2[0],10) - 1 && parseInt(date2[1],10) < parseInt(date1[1],10)){
-    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1];
-    display[1] = monthNames[date2[1] - 1] + " " + dayNum[date2[2] - 1];
-  }
+  console.log(result);
   
-  if(date1[0] !== date2[0] && date1[1] === date2[1]){
-    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1] + ", " + date1[0];
-    display[1] = monthNames[date2[1] - 1] + " " + dayNum[date2[2] - 1] + ", " + date2[0];
-  }
+  console.log(second);
   
-  if(date1[0] === date2[0] && date1[1] !== date2[1]){
-    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1];
-    display[1] = monthNames[date2[1] - 1] + " " + dayNum[date2[2] - 1] + ", " + date2[0];
+  return result;
+}
+      
+function ordinalize(num) {
+  if (num === 1) {
+    return num + "st";
+  } else if (num === 2) {
+    return num + "nd";
+  } else if (num === 3) {
+    return num + "rd";
+  } else {
+    return num + "th";
   }
-  
-  if(date1[0] === date2[0] && date1[1] === date2[1] && date1[2] === date2[2]){
-    display[0] = monthNames[date1[1] - 1] + " " + dayNum[date1[2] - 1] + ", " + date1[0];
-  }
-  
-  return display;
 }
 
-makeFriendlyDates(['2015-12-01', '2016-02-03']);
+
+
+makeFriendlyDates(['2016-07-01', '2016-07-04']);
