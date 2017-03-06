@@ -94,4 +94,117 @@ function System() {
 
     this.draw(window.performance.now());
   };
-  
+  sys.setCanvasStyle = function() {
+    document.body.style.overflow = "hidden";
+    this.canvas.style.position = "absolute";
+    this.canvas.style.width = "100%";
+    this.canvas.style.height = "auto";
+    this.canvas.style.imageRendering = "pixelated";
+  };
+  sys.createParticles = function(amount, rotation) {
+    for(var i = 0; i < amount; i++) {
+
+      var color = [i * 1 / (amount - 1)].map(function(e){
+        return "rgb(" + [
+          (Math.sin((i + 1) / amount * Math.PI * 2) * 128 + 128).toFixed(0) % 255,
+          (Math.sin((i + 1) / amount * Math.PI * 2 + (Math.PI / 2)) * 200 + 54).toFixed(0) % 255,
+          (Math.sin((i + 1) / amount * Math.PI * 3 + (Math.PI * -3)) * 192 + 63).toFixed(0) % 255
+        ].join(", ") + ")";
+      })[0];
+
+      sys.particles.push(
+        sys.createParticle(
+          i,
+          amount,
+          color,
+          [
+            (Math.max(sys.width, sys.height) * 0.02) *
+            Math.sin(
+              ((i + 1) / amount) * (Math.PI * 2) + rotation
+            ),
+            (Math.max(sys.width, sys.height) * 0.02) *
+            Math.cos(
+              ((i + 1) / amount) * (Math.PI * 2) + rotation
+            )
+          ]
+        )
+      );
+    }
+  };
+  sys.createParticle = function(index, amount, color, velocity) {
+    var position = [0, 0];
+    var velocity = [
+      velocity[0],
+      velocity[1]
+    ];
+    return new Particle(position, velocity, color);
+  };
+  return sys;
+};
+function Particle (position, velocity, color) {
+  var par = this;
+  par.color = color || "#000";
+  par.radius = 1;
+  par.friction = 1 - 0.06125;
+  if(position.length === 2) {
+    par.position = [position[0], position[1]];
+  } else {
+    par.position = [0, 0];
+  }
+  if(velocity.length === 2) {
+    par.velocity = [velocity[0], velocity[1]];
+  } else {
+    par.velocity = [0, 0];
+  }
+  par.update = function(sys) {
+    this.radius =
+      Math.sqrt(
+        Math.abs(this.velocity[0]) *
+        Math.abs(this.velocity[1]) * Math.min(sys.width,sys.height) / 20
+    ) + 0.125;
+    if(this.position[0] >= sys.width * 0.5 ||
+      this.position[0] <= (0 - sys.width * 0.5)) {
+      this.position[0] =
+        Math.sign(this.position[0]) * sys.width * 0.5;
+      this.velocity[0] *= -this.friction;
+      this.velocity[1] *=  this.friction;
+    }
+    if(this.position[1] >= sys.height * 0.5 ||
+      this.position[1] <= (0 - sys.height * 0.5)) {
+      this.position[1] =
+        Math.sign(this.position[1]) * sys.height * 0.5;
+      this.velocity[0] *=  this.friction;
+      this.velocity[1] *= -this.friction;
+    }
+    this.velocity[0] *= sys.drag;
+    this.velocity[1] *= sys.drag;
+    this.position[0] += this.velocity[0];
+    this.position[1] += this.velocity[1];
+  };
+  par.draw = function(ctx) {
+    ctx.fillStyle = this.color;
+    ctx.globalCompositeOperation = "source-over";
+    ctx.beginPath();
+    ctx.arc(
+      par.position[0],
+      par.position[1],
+      par.radius,
+      0, 2 * Math.PI
+    );
+    ctx.fill();
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.arc(
+      par.position[0],
+      par.position[1],
+      Math.max(0, par.radius / 4 * 3),
+      0, 2 * Math.PI
+    );
+    ctx.fill();
+    ctx.closePath();
+  };
+  return par;
+}
+s.setSize();
+s.start();
