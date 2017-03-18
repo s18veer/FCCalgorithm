@@ -85,4 +85,62 @@ document.addEventListener("DOMContentLoaded", function(e) {
     }
   ]
 
-  
+  locations.forEach(function(loc) {
+    r = radius-15
+    var location = document.createElement("div");
+
+    // subtract Math.PI/2 to start 0th hour at top
+    var theta = 2*Math.PI/clockWedges*loc.hour - Math.PI/2;
+    var x = r * Math.sin(theta);
+    var y = r * Math.cos(theta);
+    location.innerHTML = loc.name
+    location.setAttribute('class', 'location')
+    location.style.top = x + 'px'
+    location.style.left = y + 'px'
+
+    // correct for words being upside down if on left side
+    if (theta > Math.PI - Math.PI/2) {
+      theta = theta + Math.PI
+    }
+    location.style.transform = 'rotateZ(' + theta + 'rad)'
+
+    locationbox.appendChild(location)
+  });
+
+});
+
+function rotateTimewheel(e) {
+  var wheel = document.getElementById('wheel')
+  var reg = /rotateZ\((.*)rad\)/g;
+  var regMatches = reg.exec(wheel.style.transform)
+  var rads = regMatches? Number(regMatches[1]) : 0
+  var newRads = rads
+
+  switch (e.keyCode) {
+    case 37:
+      newRads -= 2*Math.PI/clockWedges
+      break
+    case 39:
+      newRads += 2*Math.PI/clockWedges
+      break
+  }
+
+  wheel.style.transform = 'rotateZ(' + newRads + 'rad)'
+}
+
+document.addEventListener("keydown", function (e) {
+    throttle(rotateTimewheel, e);
+}, false);
+
+
+var throttle = (function () {
+  var timeWindow = 200; // time in ms
+  var lastExecution = new Date((new Date()).getTime() - timeWindow);
+
+  return function (fn, e) {
+    if ((lastExecution.getTime() + timeWindow) <= (new Date()).getTime()) {
+      lastExecution = new Date();
+      fn(e)
+    }
+  };
+}());
