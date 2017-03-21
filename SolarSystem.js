@@ -105,3 +105,60 @@ for(var i=0; i<geometry.vertices.length; i++){
       v.z += -noise/2 + Math.random()*noise;
 }
 var sun = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } ));
+/*
+                         
+var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+var sun = new THREE.Mesh( geometry, material );
+*/
+scene.add( sun );
+function newPlanet(dfc, size, isGas) {
+  var segments = 100
+  gr = {}
+  gr.dfc = dfc
+  gr.size = size
+  gr.color = {}
+  gr.color.land = {}
+  gr.color.land.r = randint(0, 255)
+  gr.color.land.g = randint(0, 255)
+  gr.color.land.b = randint(0, 255)
+  gr.color.water = {}
+  if (isGas) {
+    gr.color.water.r = gr.color.land.r
+    gr.color.water.g = gr.color.land.g
+    gr.color.water.b = gr.color.land.b
+    segments = 32
+  } else {
+  gr.color.water.r = randint(0, 255)
+  gr.color.water.g = randint(0, 255)
+  gr.color.water.b = randint(0, 255)
+  }
+  var simplex = new SimplexNoise();
+  var diff = segments / 4
+  var geometry = new THREE.SphereGeometry( size, segments, segments );
+for ( var i = 0; i < geometry.faces.length; i +=2 ) {
+
+    var face = geometry.faces[ i ];
+  var choices = []
+  var x = i % segments
+  var y = Math.floor(i / segments)
+  var colorChoice
+  if (simplex.noise2D(x / 30, y / 30) >= 0.1) {
+    colorChoice = 'land'
+  } else {
+    colorChoice = 'water'
+  }
+  var color
+  if (colorChoice == 'land') {
+    color = rgb2color(gr.color.land.r,gr.color.land.g ,gr.color.land.b)
+  } else {
+    color = rgb2color(gr.color.water.r,gr.color.water.g ,gr.color.water.b)
+  }
+  var face2 = geometry.faces[i+1]
+    face.color.setHex( color );
+  face2.color.setHex( color );
+    
+    face.colorChoice = colorChoice
+  face2.colorChoice  = colorChoice ;
+}
+gr.mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { vertexColors: THREE.FaceColors } ));
+  
