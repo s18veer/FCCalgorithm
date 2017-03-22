@@ -161,4 +161,56 @@ for ( var i = 0; i < geometry.faces.length; i +=2 ) {
   face2.colorChoice  = colorChoice ;
 }
 gr.mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { vertexColors: THREE.FaceColors } ));
-  
+  /*
+  var material = new THREE.MeshPhongMaterial({color: RGB(gr.color.r, gr.color.g, gr.color.b)})
+  gr.mesh = new THREE.Mesh( geometry, material);
+  */
+  gr.mesh.position.z = dfc
+  point = {x: gr.mesh.position.x, y: gr.mesh.position.z}
+  center = {x: 0, y: 0}
+  r = rotateAround(point, center, randint(0, 360))
+  gr.mesh.position.x = r.x
+  gr.mesh.position.z = r.y
+  //rotation
+  gr.axisRotation = randoffset(20, 10)
+  gr.mesh.rotation.x = deg(gr.axisRotation)
+  gr.mesh.rotation.z = deg(gr.axisRotation)
+  scene.add(gr.mesh)
+  if (isGas) {
+    gr.isRing = Math.random() >= 0.3
+  }
+  if (gr.isRing) {
+    gr.ring = {}
+    gr.ring.count = 150,
+    gr.ring.particles = new THREE.Geometry(),
+    gr.ring.material = new THREE.PointsMaterial({
+      size: 10,
+      map: createCanvasMaterial(rgb2hex(RGB(randint(0, 255), randint(0, 255), randint(0, 255))), 256),
+      transparent: true,
+      depthWrite: false
+    });
+
+// now create the individual particles
+for (var p = 0; p < gr.ring.count; p++) {
+
+  // create a particle with random
+  var pX = randoffset(size * 1.5, 10),
+      pY = randoffset(0, 10),
+      pZ = 0
+  point = {x: pX, y: 0}
+  center = {x: 0, y: 0}
+  r = rotateAround(point, center, randint(0, 360))
+  pX = r.x
+  pY = r.y
+  var particle = new THREE.Vector3(pX, pY, pZ)
+
+  // add it to the geometry
+  gr.ring.particles.vertices.push(particle);
+  gr.ring.rdeg = randint(25, 50) / 100
+}
+
+// create the particle system
+gr.ring.system = new THREE.Points(
+    gr.ring.particles,
+    gr.ring.material);
+
