@@ -214,3 +214,67 @@ gr.ring.system = new THREE.Points(
     gr.ring.particles,
     gr.ring.material);
 
+// add it to the scene
+scene.add(gr.ring.system);
+    gr.ring.system.rotation.x = deg(randint(0, 360))
+    gr.ring.system.rotation.y = deg(randint(0, 360))
+  } else {
+  gr.moonCount = randint(0, 10)
+  gr.moons = []
+  for (var i = 0; i < gr.moonCount; i++) {
+    gr.moons.push(newMoon(gr.size, gr.mesh.position, dfc, gr.moonCount))
+  }
+  }
+  return gr
+}
+function newMoon(size, position, dfc, num) {
+  gl = {}
+  gl.size = (size / 2) / (num)
+  gl.dfc = dfc
+  gl.size = randoffset(gl.size, size / 10)
+  var geometry = new THREE.TetrahedronGeometry( gl.size, randint(2,1));
+  var color = randint(100, 100)
+  gl.color = color
+  var material = new THREE.MeshPhongMaterial({color: rgb2hex(RGB(color,color,color))})
+  gl.mesh = new THREE.Mesh(geometry, material)
+  scene.add(gl.mesh)
+  gl.mesh.position.x = (size * 2) + position.x + gl.size
+  gl.mesh.position.y = position.y
+  gl.mesh.position.z = position.z
+  /*
+  point = {x: gl.mesh.position.x, y: gl.mesh.position.z}
+  center = {x: position.x, y: position.z}
+  r = rotateAround(point, center, randint(0, 360))
+  gl.mesh.position.x = r.x
+  gl.mesh.position.z = r.y
+  */
+  pi2 = Math.PI * 2
+  gl.rdeg = randint(25, 50) / 100
+  gl.rang = randint(-pi2, pi2 * 2) / 10
+  return gl
+}
+planets = []
+prev = 200
+var mindfc
+var astPlace = randint(3, 4)
+var astDist
+for (var i = 0; i < 10; i++) {
+  if (i != astPlace) {
+  sizeD = Math.abs(prev - 100) / 20
+  size = randint(sizeD, 50)
+  dfc = size + prev
+  dfc += randint(50, 50)
+  if (i == 0) {
+    mindfc = dfc
+  }
+    var gasplanet = false
+    if (i > astPlace) {
+      gasplanet = true
+    }
+  planets.push(newPlanet(dfc, size, gasplanet))
+  prev = dfc + size
+  } else {
+    prev += 100
+    astDist = prev - 50
+  }
+}
