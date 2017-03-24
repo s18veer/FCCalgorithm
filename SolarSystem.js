@@ -278,3 +278,79 @@ for (var i = 0; i < 10; i++) {
     astDist = prev - 50
   }
 }
+//asteroid particle system:
+
+
+
+var astCount = 600,
+    asteroids = new THREE.Geometry(),
+    aMaterial = new THREE.PointsMaterial({
+      size: 10,
+      map: createCanvasMaterial('#'+808080, 256),
+      transparent: true,
+      depthWrite: false
+    });
+
+// now create the individual particles
+for (var p = 0; p < astCount; p++) {
+
+  // create a particle with random
+  var pX = randoffset(astDist, 20),
+      pY = randoffset(0, 20),
+      pZ = 0
+  point = {x: pX, y: 0}
+  center = {x: 0, y: 0}
+  r = rotateAround(point, center, randint(0, 360))
+  pX = r.x
+  pZ = r.y
+  var particle = new THREE.Vector3(pX, pY, pZ)
+
+  // add it to the geometry
+  asteroids.vertices.push(particle);
+}
+
+// create the particle system
+var astSystem = new THREE.Points(
+    asteroids,
+    aMaterial);
+
+// add it to the scene
+scene.add(astSystem);
+
+
+
+//star particle system
+var starCount = 1000,
+    stars = new THREE.Geometry(),
+    sMaterial = new THREE.PointsMaterial({
+      color: 0xFFFFFF,
+      size: 50
+    });
+
+// now create the individual particles
+for (var p = 0; p < starCount; p++) {
+
+  // create a particle with random
+  var pX = randint(5000, 5000),
+      pY,
+      pZ
+  point = {x: pX, y: 0}
+  center = {x: 0, y: 0}
+  r = rotateAround(point, center, randint(0, 360))
+  pX = r.x
+  pY = r.y
+  point = {x: pX, y: 0}
+  center = {x: 0, y: 0}
+  r = rotateAround(point, center, randint(0, 360))
+  pX = r.x
+  pZ = r.y
+  var particle = new THREE.Vector3(pX, pY, pZ)
+
+  // add it to the geometry
+  stars.vertices.push(particle);
+}
+
+// create the particle system
+var starSystem = new THREE.Points(
+    stars,
+    sMaterial);
