@@ -354,3 +354,81 @@ for (var p = 0; p < starCount; p++) {
 var starSystem = new THREE.Points(
     stars,
     sMaterial);
+
+// add it to the scene
+scene.add(starSystem);
+      //end of elements
+			camera.position.x = 2000;
+      camera.position.y = 500
+      camera.position.z = 0;
+      lookAt = new THREE.Vector3( 0, 0, 0 )
+camera.lookAt(lookAt)
+oControls.target.set(0, 0, 0);
+oControls.enablePan = false;
+oControls.minDistance = 300;
+oControls.maxDistance = 5000;
+oControls.update()
+			var render = function () {
+				requestAnimationFrame( render );
+        mainloop()
+				renderer.render(scene, camera);
+			};
+function sunrotate(p) {
+  var rdeg = 100 / (p.dfc + 30 - mindfc)
+    rdeg /= 3
+      point = {x: p.mesh.position.x, y: p.mesh.position.z}
+  center = {x: 0, y: 0}
+  r = rotateAround(point, center, rdeg)
+  p.mesh.position.x = r.x
+  p.mesh.position.z = r.y
+    point = {x: p.mesh.position.x, y: p.mesh.position.y}
+  r = rotateAround(point, center, (rdeg / Math.PI)/2)
+  p.mesh.position.x = r.x
+  p.mesh.position.y = r.y
+  return p
+    }
+function mainloop() {
+  for (var i = 0; i < planets.length; i++) {
+    
+    planet = planets[i]
+    planet = sunrotate(planet)
+    planet.mesh.rotation.y += deg(1)
+    if (planet.isRing) {
+      planet.ring.system.rotation.z -= deg(planet.ring.rdeg)
+      planet.ring.system.position.x = planet.mesh.position.x
+      planet.ring.system.position.y = planet.mesh.position.y
+      planet.ring.system.position.z = planet.mesh.position.z
+    } else {
+  for (var l = 0; l < planet.moons.length; l++) {
+    moon = planet.moons[l]
+    moon = sunrotate(moon)
+    point = {x: moon.mesh.position.x, y: moon.mesh.position.z}
+  center = {x: planet.mesh.position.x, y: planet.mesh.position.z}
+  r = rotateAround(point, center, moon.rdeg)
+  moon.mesh.position.x = r.x
+  moon.mesh.position.z = r.y
+    
+    point = {x: moon.mesh.position.x, y: moon.mesh.position.y}
+  center = {x: planet.mesh.position.x, y: planet.mesh.position.y}
+  r = rotateAround(point, center, moon.rang)
+  moon.mesh.position.x = r.x
+  moon.mesh.position.y = r.y
+    moon.mesh.rotation.x += deg(1)
+    moon.mesh.rotation.y += deg(1)
+  }
+    }
+  }
+  astSystem.rotation.y -= deg(0.05)
+}
+			render();
+
+window.addEventListener( 'resize', onWindowResize, false );
+
+function onWindowResize(){
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
