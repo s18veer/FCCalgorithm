@@ -5,8 +5,8 @@ function sceneTwo() {
   var tl = new TimelineLite();
   tl.from(contour, 1.5, {
     scale: .9,
-    transformOrigin: "60% 50%",
-    fill: '#000000'
+    transformOrigin: "70% 80%",
+    fill: '#000fff'
 
   }, 'face');
   return tl;
