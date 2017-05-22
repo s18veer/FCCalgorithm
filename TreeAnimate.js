@@ -97,3 +97,78 @@ var TREE = {
 		return node;
 	}
 };
+var NODE = function(renderer, x0, y0, x1, y1, width, radius, level){
+	this.renderer = renderer;
+	this.width = width;
+	this.level = level;
+	this.init(x0, y0, x1, y1, radius);
+};
+NODE.prototype = {
+	UNIT_LENGTH : 3,
+	THRESHOLD_LEVEL : 4,
+	
+	init : function(x0, y0, x1, y1, radius){
+		this.nodes = [];
+		this.dx = (x0 + x1) / 2;
+		this.dy = (y0 + y1) / 2;
+		this.length = Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2));
+		this.theta = Math.atan2(x1 - x0, y0 - y1);
+		this.maxCount = Math.ceil(this.length / this.UNIT_LENGTH);
+		this.count = this.maxCount;
+		this.leaves = [];
+		
+		if(this.level >= this.THRESHOLD_LEVEL){
+			for(var i = -1; i <= 1; i += 2){
+				this.leaves.push(new LEAF(this.renderer, this.dx, this.dy, (radius + this.width / 2) * i, -this.length / 2, radius, this.theta, -Math.PI / 10 * i));
+			}
+		}
+	},
+	renderBranch : function(context, saturationRate){
+		context.save();
+		context.translate(this.dx, this.dy);
+		context.rotate(this.theta);
+		context.strokeStyle = 'hsl(' + (40 + 20 * this.level) + ', ' + saturationRate * 30 + '%, ' + (10 + 10 * saturationRate) + '%)';
+		context.lineWidth = this.width;
+		context.beginPath();
+		context.moveTo(0, this.length / 2);
+		context.lineTo(0, this.length / 2 - this.length * (this.maxCount - this.count) / this.maxCount);
+		context.stroke();
+		context.restore();
+		
+		if(this.count > 0){
+			this.count--;
+			return false;
+		}else{
+			var rendered = true;
+			
+			for(var i = 0, length = this.nodes.length; i < length; i++){
+				if(!this.nodes[i].renderBranch(context, saturationRate)){
+					rendered = false;
+				}
+			}
+			return rendered;
+		}
+	},
+	renderLeaf : function(context, isLeaf, isForward, saturationRate){
+		if(!isLeaf){
+			return;
+		}
+		for(var i = 0, length = this.leaves.length; i < length; i++){
+			this.leaves[i].render(context, isForward, saturationRate);
+		}
+		for(var i = 0, length = this.nodes.length; i < length; i++){
+			this.nodes[i].renderLeaf(context, isLeaf, isForward, saturationRate);
+		}
+	}
+};
+var LEAF = function(renderer, x0, y0, x, y, radius, theta0, theta){
+	this.renderer = renderer;
+	this.x0 = x0;
+	this.y0 = y0;
+	this.x = x;
+	this.y = y;
+	this.radius = radius;
+	this.theta0 = theta0;
+	this.theta = theta;
+	this.init(false);
+};
