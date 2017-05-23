@@ -172,3 +172,104 @@ var LEAF = function(renderer, x0, y0, x, y, radius, theta0, theta){
 	this.theta = theta;
 	this.init(false);
 };
+LEAF.prototype = {
+	INIT_HUE : 160,
+	DELTA_HUE : 0.8,
+	GRAVITY : 0.001,
+	DELTA_SCALE : 0.01,
+	DELTA_OPACITY : 0.005,
+	FALLING_RATE : 0.0005,
+	
+	init : function(toRetry){
+		this.dx = 0;
+		this.dy = 0;
+		this.dtheta = 0;
+		this.status = 0;
+		this.scale = 0;
+		this.hueLimit = this.renderer.getRandomValue(0, 40);
+		this.hue = toRetry ? this.hueLimit : this.INIT_HUE;
+		this.z = this.renderer.getRandomValue(-0.5, 0.5);
+		this.magnification = 1 - this.z * 0.2;
+		this.vx = this.renderer.getRandomValue(-0.3, 0.3) * this.magnification;
+		this.vy = this.magnification / 2;
+		this.maxWaitCount = this.renderer.getRandomValue(500, 1000) | 0;
+		this.waitCount = this.maxWaitCount;
+		this.opacity = 1;
+	},
+	controlStatus : function(){
+		switch(this.status){
+		case 0:
+			if(this.scale < 1){
+				this.scale += this.DELTA_SCALE;
+			}else{
+				this.status = 1;
+			}
+			break;
+		case 1:
+			if(this.hue > this.hueLimit){
+				this.hue -= this.DELTA_HUE;
+			}else{
+				if(Math.random() < this.FALLING_RATE){
+					this.status = 2;
+				}
+			}
+			break;
+		case 2:
+			this.dx += this.vx;
+			this.dy += this.vy;
+			this.vy += this.GRAVITY;
+			this.dtheta -= this.vx / 10;
+			this.dtheta %= Math.PI * 2;
+			
+			var x = this.x0 + this.dx + this.x,
+				y = this.y0 + this.dy + this.y;
+				
+			if(x < -this.radius || x > this.renderer.width + this.radius || y > this.renderer.height * 9 / 10 - this.renderer.height / 10 * this.z){
+				this.status = 3;
+			}
+			break;
+		case 3:
+			if(--this.waitCount == 0){
+				this.status = 4;
+			}
+			break;
+		case 4:
+			this.opacity -= this.DELTA_OPACITY;
+			
+			if(this.opacity <= 0){
+				this.init(true);
+			}
+		}
+	},
+	render : function(context, isForward, saturationRate){
+		if(isForward && this.z > 0 || !isForward && this.z <= 0){
+			return;
+		}
+		var gradient = context.createLinearGradient(0, -this.radius, 0, this.radius),
+			saturation = ((50 + 30 * (this.INIT_HUE - this.hue) / (this.INIT_HUE - this.hueLimit)) * saturationRate) | 0,
+			hue = this.hue | 0,
+			luminance0 = (30 + 20 * this.magnification * saturationRate) | 0,
+			luminance1 = (25 + 15 * this.magnification * saturationRate) | 0;
+			
+		gradient.addColorStop(0, 'hsla(' + hue + ', ' + saturation + '%, ' + luminance0 + '%, ' + this.opacity + ')');
+		gradient.addColorStop(0.5, 'hsla(' + hue + ', ' + saturation + '%, ' + luminance1 + '%, ' + this.opacity + ')');
+		gradient.addColorStop(1, 'hsla(' + hue + ', ' + saturation + '%, ' + luminance0 + '%, ' + this.opacity + ')');
+		context.save();
+		context.fillStyle = gradient;
+		context.translate(this.x0 + this.dx, this.y0 + this.dy);
+		context.rotate(this.theta0);
+		context.translate(this.x, this.y);
+		context.rotate(this.theta + this.dtheta);
+		context.scale(this.scale * this.magnification, this.scale * this.magnification);
+		context.beginPath();
+		context.moveTo(-this.radius, 0);
+		context.quadraticCurveTo(0, -this.radius, this.radius, 0);
+		context.quadraticCurveTo(0, this.radius, -this.radius, 0);
+		context.fill();
+		context.restore();
+		this.controlStatus();
+	}
+};
+$(function(){
+	RENDERER.init();
+});
