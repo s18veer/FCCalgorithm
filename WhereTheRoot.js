@@ -19,12 +19,12 @@ class Line {
 		this.y -= dy / (size * 0.25);
 		if (this.w > 1) {
 			ict.beginPath();
-			ict.fillStyle = "#fff";
+			ict.fillStyle = "#000";
 			ict.arc(this.x, this.y, this.w + 0.5, 0, 2 * Math.PI);
 			ict.fill();
 		}
 		ict.beginPath();
-		ict.fillStyle = "#000";
+		ict.fillStyle = "#fff";
 		ict.arc(this.x, this.y, this.w, 0, 2 * Math.PI);
 		ict.fill();
 		if (this.n > 0) {
