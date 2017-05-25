@@ -11,18 +11,18 @@ document.addEventListener("DOMContentLoaded", function(e) {
   var timeSlices = [
     {
       className: 'awake-hours',
-      start: 7,
-      end: 23
+      start: 4,
+      end: 20
     },
     {
       className: 'work-hours',
-      start: 9,
-      end: 17
+      start: 7,
+      end: 15
     },
     {
       className: 'social-hours',
-      start: 8,
-      end: 22
+      start: 6,
+      end: 21
     }
   ]
 
