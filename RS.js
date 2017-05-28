@@ -154,3 +154,70 @@ Cell.prototype = {
   }
 };
 
+function update() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+
+  cellCount = 0;
+
+  var cell = new Cell(pts[0], pts[1], pts[2]);
+  PRNG.setSeed(seed);
+
+  var iteration = 6;
+  while (iteration--) {
+    cell.split(parseInt(PRNG.random() * 4));
+  }
+
+  ctx.clearRect(0, 0, w, h);
+  ctx.lineWidth = 0.15;
+
+  var grd = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, h);
+  grd.addColorStop(0, "rgba(0,0,0,0)");
+  grd.addColorStop(1, "rgba(0,0,0,.30)");
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.beginPath();
+  cell.render(ctx);
+  ctx.stroke();
+}
+
+//setup
+
+var canvas = document.createElement("canvas");
+document.body.appendChild(canvas);
+var w = (canvas.width = window.innerWidth);
+var h = (canvas.height = window.innerHeight);
+var ctx = canvas.getContext("2d");
+
+var seed = 1, cellCount;
+var PRNG = {
+  a: 16807,
+  /* multiplier */ m: 0x7fffffff,
+  /* 2**31 - 1 */ randomnum: 1,
+  div: 1 / 0x7fffffff,
+  nextlongrand: function(seed) {
+    var lo, hi;
+    lo = this.a * (seed & 0xffff);
+    hi = this.a * (seed >> 16);
+    lo += (hi & 0x7fff) << 16;
+    if (lo > this.m) {
+      lo &= this.m;
+      ++lo;
+    }
+    lo += hi >> 15;
+    if (lo > this.m) {
+      lo &= this.m;
+      ++lo;
+    }
+    return lo;
+  },
+  random: function() /* return next random number */ {
+    this.randomnum = this.nextlongrand(this.randomnum);
+    return this.randomnum * this.div;
+  },
+  setSeed: function(value) {
+    this.randomnum = value <= 0 ? 1 : value;
+  }
+};
+
