@@ -221,3 +221,60 @@ var PRNG = {
   }
 };
 
+var pts = [];
+var step = Math.PI * 2 / 3;
+function reset() {
+  seed++;
+  var r = h * 0.62;
+  pts = [];
+  for (var i = -Math.PI / 2; i < Math.PI * 2; i += step) {
+    var p = new Point(
+      w / 2 + Math.cos(i) * r,
+      h / 2 + r * 0.225 + Math.sin(i) * r
+    );
+    pts.push(p);
+  }
+  update();
+}
+
+setInterval(reset, 2000);
+reset();
+
+//utils
+function area(a, b, c) {
+  return distance(a, b) * distance(a, c) * 0.5;
+}
+
+function squareDistance(x0, y0, x1, y1) {
+  return (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
+}
+function distance(p0, p1) {
+  return Math.sqrt(squareDistance(p0.x, p0.y, p1.x, p1.y));
+}
+function lerp(t, a, b) {
+  return a * (1 - t) + b * t;
+}
+function getPointAt(t, a, b) {
+  return new Point(lerp(t, a.x, b.x), lerp(t, a.y, b.y));
+}
+function project(p, a, b, asSegment) {
+  var dx = b.x - a.x;
+  var dy = b.y - a.y;
+  if (dx == 0 && dy == 0) {
+    return a;
+  }
+  var t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy);
+  if (t < 0 || t > 1) return constrain(p, a, b);
+  return new Point(a.x + t * dx, a.y + t * dy);
+}
+function constrain(p, a, b) {
+  var dx = b.x - a.x;
+  var dy = b.y - a.y;
+  if (dx == 0 && dy == 0) {
+    return a;
+  } else {
+    var t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy);
+    t = Math.min(Math.max(0, t), 1);
+    return new Point(a.x + t * dx, a.y + t * dy);
+  }
+}
