@@ -1,11 +1,11 @@
-var canvas, ctx, time, target,
+var canvas, dvs, time, target,
 	particles = [];
 
 window.addEventListener('load', initialize, false);
 
 function initialize() {
 	canvas = document.createElement('canvas');
-	ctx = canvas.getContext('2d');
+	dvs = canvas.getContext('2d');
 
 	time = new Time;
 	target = new Target;
@@ -27,33 +27,33 @@ function resizeHandler() {
 	canvas.height = window.innerHeight;
 	canvas.width = window.innerWidth;
 
-	target.radius = canvas.width * 0.5;
+	target.radius = canvas.width * 0.7;
 }
 
 /* Rendering and such */
 
 function preLoop() {
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	dvs.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function render() {
 	requestAnimationFrame(render);
 	time.update();
 
-	ctx.save();
+	dvs.save();
   
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	ctx.translate(canvas.width / 2, canvas.height / 2);
+  dvs.fillStyle = 'rgba(0, 0, 0, 0.7)';
+	dvs.fillRect(0, 0, canvas.width, canvas.height);
+	dvs.translate(canvas.width / 2, canvas.height / 2);
 
-	target.update(ctx, time);
+	target.update(dvs, time);
 
-	ctx.globalCompositeOperation = 'lighter';
+	dvs.globalCompositeOperation = 'lighter';
 
 	var i = particles.length;
-	while(i--) particles[i].render(ctx, time);
+	while(i--) particles[i].render(dvs, time);
 
-	ctx.restore();
+	dvs.restore();
 }
 
 /* Objects */
@@ -65,7 +65,7 @@ function Target() {
 	this.radius = 0;
 }
 
-Target.prototype.update = function(ctx, time) {
+Target.prototype.update = function(dvs, time) {
 	this.position.x = Math.sin(time.elapsed / 2) * canvas.width * 0.5 * 0.8;
 	this.position.y = Math.sin(time.elapsed * 2) * canvas.height * 0.5 * 0.8;
 };
@@ -87,7 +87,7 @@ function Particle() {
 	this.strength = 1;
 }
 
-Particle.prototype.update = function(ctx, time) {
+Particle.prototype.update = function(dvs, time) {
 	var xd = target.position.x - this.position.x;
 	var yd = target.position.y - this.position.y;
 
@@ -126,14 +126,14 @@ Particle.prototype.update = function(ctx, time) {
 	}
 };
 
-Particle.prototype.render = function(ctx, time) {
-	this.update(ctx, time);
+Particle.prototype.render = function(dvs, time) {
+	this.update(dvs, time);
 
-	ctx.fillStyle = 'hsl(' + ((time.elapsed * 10 + this.colorOffset) % 360) + ', 100%, 50%)';
+	dvs.fillStyle = 'hsl(' + ((time.elapsed * 10 + this.colorOffset) % 360) + ', 100%, 50%)';
 
-	ctx.beginPath();
-	ctx.arc(this.position.x, this.position.y, this.size, 0, Math.PI * 2, true);
-	ctx.fill();
+	dvs.beginPath();
+	dvs.arc(this.position.x, this.position.y, this.size, 0, Math.PI * 2, true);
+	dvs.fill();
 };
 
 function Vector(x, y) {
@@ -146,3 +146,5 @@ function Time(){var a=(new Date).getTime();this.elapsed=this.delta=0;this._start
 
 // RequestAnimationFrame polyfill
 (function(){for(var e=0,b=["ms","moz","webkit","o"],a=0;a<b.length&&!self.requestAnimationFrame;++a)self.requestAnimationFrame=self[b[a]+"RequestAnimationFrame"];void 0===self.requestAnimationFrame&&void 0!==self.setTimeout&&(self.requestAnimationFrame=function(a){var c=Date.now(),d=Math.max(0,16-(c-e)),b=self.setTimeout(function(){a(c+d)},d);e=c+d;return b})})();
+
+
