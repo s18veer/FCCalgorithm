@@ -1,0 +1,34 @@
+$(function() {
+
+const $input = $('#autocomplete__input'); 
+	
+$input.on("input",function(e){
+	if (!this.value) return;
+	closeAutocomplete();
+	
+ const suggestions = [
+	 `<strong>${this.value}</strong>`,
+	 `veritatis et <strong>${this.value}</strong>`,
+	 `ut aliquid ex <strong>${this.value}</strong> vero eos`
+ ]
+	$input.after('<div class="autocomplete__items">');
+	
+	for (i=0; i < suggestions.length;i++) {
+		$(".autocomplete__items")
+			.append(`<div>${suggestions[i]}</div>`);
+	}
+});
+
+function closeAutocomplete() {
+	$('.autocomplete__items').remove();
+}
+
+$input.on('keydown',function(){
+	$('.autocomplete__items').empty();
+});
+	
+	/*
+	$(document).on("click",()=>{
+		closeAutocomplete();
+	})*/
+})
